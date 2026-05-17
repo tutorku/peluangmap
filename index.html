@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PeluangMap — AI Readiness Diagnostic UMKM</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Lora:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#F8FAF8; --bg2:#F0F5F1; --bg3:#E8F0EB;
+  --surface:#FFFFFF; --sur2:#F5FAF6;
+  --border:#D0E4D6; --bord2:#B8D4C0;
+  --text:#1A2E22; --muted:#4A7A5A; --faint:#7AAA88;
+  --green:#16A34A; --gdim:#DCFCE7; --gdim2:#BBF7D0;
+  --amber:#D97706; --adim:#FEF3C7;
+  --blue:#2563EB; --bdim:#DBEAFE;
+  --rose:#E11D48; --rdim:#FFE4E6;
+  --violet:#7C3AED; --vdim:#EDE9FE;
+  --r:14px; --rsm:9px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.65;overflow-x:hidden;}
+button,input,textarea,select{font-family:inherit;}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:200;height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;background:rgba(248,250,248,0.95);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);}
+.nav-logo{display:flex;align-items:center;gap:9px;text-decoration:none;}
+.nav-icon{width:30px;height:30px;border-radius:8px;background:var(--gdim2);border:1px solid var(--bord2);display:flex;align-items:center;justify-content:center;font-size:14px;}
+.nav-wordmark{font-size:15px;font-weight:700;color:var(--text);}
+.nav-sub{font-size:10px;color:var(--muted);display:block;line-height:1;}
+.step-pill{font-size:11px;font-weight:600;padding:4px 14px;border-radius:99px;background:var(--gdim);color:var(--green);border:1px solid #BBF7D0;}
+
+/* PAGE SWITCH */
+.pg{display:none;} .pg.on{display:block;}
+
+/* FORM */
+.form-wrap{max-width:700px;margin:0 auto;padding:2rem 1.5rem 9rem;}
+.hero-form{text-align:center;padding:1.5rem 0 1.75rem;}
+.hero-eyebrow{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--green);border:1px solid var(--gdim2);background:var(--gdim);padding:3px 14px;border-radius:99px;margin-bottom:14px;}
+.hero-h1{font-family:'Lora',serif;font-size:clamp(22px,4vw,34px);font-weight:600;line-height:1.25;margin-bottom:10px;}
+.hero-h1 em{font-style:italic;color:var(--green);}
+.hero-sub{font-size:13px;color:var(--muted);max-width:460px;margin:0 auto 14px;}
+.theory-tags{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:4px;}
+.ttag{font-size:10px;font-weight:600;padding:3px 10px;border-radius:99px;border:1px solid;}
+
+/* PROFIL CARD */
+.profil-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;overflow:hidden;}
+.profil-head{display:flex;align-items:flex-start;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border);}
+.profil-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;margin-top:1px;background:var(--gdim2);border:1px solid var(--bord2);}
+.profil-title{font-size:13px;font-weight:600;margin-bottom:2px;}
+.profil-desc{font-size:11px;color:var(--muted);}
+.profil-body{padding:16px 18px;}
+.profil-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:500px){.profil-grid{grid-template-columns:1fr;}}
+.profil-grid-full{grid-column:1/-1;}
+.field-label{font-size:11px;font-weight:600;color:var(--muted);margin-bottom:5px;display:block;}
+.field-req{color:#E11D48;}
+.field-input{width:100%;padding:9px 13px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rsm);color:var(--text);font-size:13px;outline:none;transition:border-color .15s;}
+.field-input:focus{border-color:var(--green);}
+select.field-input{cursor:pointer;}
+
+/* SECTION CARD */
+.fsec{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;overflow:hidden;}
+.fsec-head{display:flex;align-items:flex-start;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border);}
+.fsec-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;margin-top:1px;}
+.fsec-meta{flex:1;}
+.fsec-title{font-size:13px;font-weight:600;margin-bottom:2px;}
+.fsec-desc{font-size:11px;color:var(--muted);}
+.fsec-score{flex-shrink:0;font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;border:1px solid;margin-top:2px;}
+.fsec-body{padding:16px 18px;}
+
+/* QUESTION BLOCK */
+.qblock{margin-bottom:18px;}
+.qblock:last-child{margin-bottom:0;}
+.qlabel{font-size:13px;font-weight:500;margin-bottom:4px;display:block;line-height:1.55;}
+.qnote{font-size:11px;color:var(--faint);margin-bottom:6px;display:block;font-style:italic;}
+.qtype{font-size:10px;color:var(--faint);margin-bottom:6px;display:block;}
+.qnum{display:inline-block;font-size:10px;font-weight:700;color:var(--faint);margin-bottom:3px;}
+.q-divider{height:1px;background:var(--border);margin:16px 0;}
+.qtextarea{width:100%;padding:10px 13px;background:var(--bg3);border:1.5px solid var(--border);border-radius:var(--rsm);color:var(--text);font-size:13px;outline:none;transition:border-color .15s,box-shadow .15s;resize:vertical;min-height:72px;line-height:1.6;}
+.qtextarea:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(22,163,74,.1);background:var(--surface);}
+.qtextarea::placeholder{color:var(--faint);}
+.qtextarea.filled{border-color:var(--bord2);}
+.char-count{font-size:10px;color:var(--faint);text-align:right;margin-top:3px;transition:color .2s;}
+.char-warn{font-size:11px;color:#D97706;background:#FFFBEB;border:1px solid #FDE68A;border-radius:6px;padding:4px 10px;margin-top:4px;display:none;}
+.char-warn.show{display:block;}
+.qtextarea.error{border-color:#FCA5A5 !important;background:#FFF5F5;}
+
+/* SCORING NOTE */
+.scoring-note{font-size:11px;color:var(--muted);background:var(--bg3);border-radius:var(--rsm);padding:8px 12px;margin-top:12px;border:1px solid var(--border);}
+
+/* FOOTER */
+.form-footer{position:fixed;bottom:0;left:0;right:0;background:rgba(248,250,248,0.97);backdrop-filter:blur(12px);border-top:1px solid var(--border);padding:13px 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:12px;z-index:100;}
+.prog-mini{flex:1;max-width:320px;}
+.prog-mini-track{height:3px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-bottom:5px;}
+.prog-mini-fill{height:100%;background:var(--green);border-radius:3px;transition:width .3s;}
+.prog-mini-lbl{font-size:11px;color:var(--faint);}
+.btn-scan{background:var(--green);color:#071A0C;border:none;border-radius:var(--rsm);padding:11px 26px;font-size:14px;font-weight:700;transition:all .2s;white-space:nowrap;cursor:pointer;}
+.btn-scan:hover{filter:brightness(1.08);transform:translateY(-1px);}
+.btn-scan:disabled{opacity:.4;cursor:not-allowed;transform:none;filter:none;}
+
+/* RESULT */
+.res-wrap{max-width:860px;margin:0 auto;padding:2rem 1.5rem 4rem;}
+.res-hero{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1.75rem;margin-bottom:14px;position:relative;overflow:hidden;}
+.res-hero::before{content:'';position:absolute;top:-80px;right:-80px;width:260px;height:260px;background:radial-gradient(circle,rgba(22,163,74,0.08),transparent 70%);pointer-events:none;}
+.res-hero-top{display:flex;align-items:flex-start;gap:1.5rem;flex-wrap:wrap;}
+.res-biz{font-family:'Lora',serif;font-size:20px;font-weight:600;margin-bottom:4px;}
+.res-type{font-size:12px;color:var(--muted);margin-bottom:12px;}
+.ars-box{text-align:center;flex-shrink:0;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px 24px;min-width:140px;}
+.ars-label{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:6px;}
+.ars-score{font-family:'Lora',serif;font-size:52px;font-weight:600;line-height:1;margin-bottom:4px;}
+.ars-max{font-size:11px;color:var(--faint);}
+.ars-level{font-size:12px;font-weight:700;padding:4px 14px;border-radius:99px;margin-top:8px;display:inline-block;}
+
+/* DIM GRID */
+.dim-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+@media(max-width:580px){.dim-grid{grid-template-columns:1fr;}}
+.dim-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;}
+.dim-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.dim-card-label{font-size:12px;font-weight:600;}
+.dim-card-score{font-size:18px;font-weight:700;}
+.dim-bar-track{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;}
+.dim-bar-fill{height:100%;border-radius:3px;transition:width .8s ease;}
+.dim-card-items{margin-top:10px;display:flex;flex-direction:column;gap:5px;}
+.dim-card-item{font-size:11px;color:var(--muted);display:flex;gap:6px;align-items:flex-start;line-height:1.5;}
+
+/* STAGE MAP */
+.rmap-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:14px;}
+.rmap-title{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px;}
+.rmap-stages{display:flex;gap:0;position:relative;}
+.rmap-stages::before{content:'';position:absolute;top:18px;left:0;right:0;height:2px;background:var(--border);z-index:0;}
+.rmap-stage{flex:1;display:flex;flex-direction:column;align-items:center;position:relative;z-index:1;}
+.rmap-dot{width:36px;height:36px;border-radius:50%;border:2px solid var(--border);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:14px;margin-bottom:8px;transition:all .3s;}
+.rmap-dot.active{border-color:var(--green);background:var(--gdim2);box-shadow:0 0 0 4px rgba(22,163,74,0.15);}
+.rmap-dot.done{border-color:var(--green);background:var(--gdim);}
+.rmap-slabel{font-size:10px;font-weight:600;color:var(--faint);text-align:center;line-height:1.3;max-width:64px;}
+.rmap-slabel.active{color:var(--green);}
+
+/* AI PANEL */
+.ai-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:14px;}
+.ai-panel-head{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;}
+.ai-text{font-size:13px;line-height:1.9;color:var(--text);white-space:pre-wrap;}
+
+/* ROADMAP */
+.road-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:14px;}
+.road-head{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px;}
+.road-steps{display:flex;flex-direction:column;gap:10px;}
+.road-step{display:flex;gap:14px;align-items:flex-start;padding:14px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;}
+.road-num{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;background:var(--green);}
+.road-body{flex:1;}
+.road-week{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:2px;color:var(--muted);}
+.road-title{font-size:13px;font-weight:600;margin-bottom:3px;}
+.road-desc{font-size:12px;color:var(--muted);line-height:1.55;}
+.road-tag{display:inline-block;font-size:10px;font-weight:600;padding:2px 9px;border-radius:99px;margin-top:6px;border:1px solid;background:var(--gdim);color:var(--green);border-color:var(--gdim2);}
+
+/* DIAG */
+.diag-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:14px;}
+.diag-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:540px){.diag-grid{grid-template-columns:1fr;}}
+.diag-box{background:var(--bg3);border-radius:10px;padding:14px;}
+.diag-box-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;}
+.diag-item{display:flex;gap:8px;margin-bottom:6px;font-size:12px;line-height:1.5;align-items:flex-start;}
+.diag-bullet-ok{color:var(--green);font-weight:700;flex-shrink:0;}
+.diag-bullet-pr{color:#E11D48;font-weight:700;flex-shrink:0;}
+
+/* ACTION */
+.action-strip{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;margin-bottom:14px;}
+.action-strip-txt{flex:1;}
+.action-strip-title{font-size:14px;font-weight:600;margin-bottom:3px;}
+.action-strip-sub{font-size:12px;color:var(--muted);}
+.btn-next{background:var(--green);color:#071A0C;border:none;border-radius:var(--rsm);padding:11px 22px;font-size:13px;font-weight:700;white-space:nowrap;transition:all .2s;cursor:pointer;}
+.btn-next:hover{filter:brightness(1.08);}
+.btn-redo{background:none;border:1px solid var(--border);border-radius:var(--rsm);color:var(--muted);padding:11px 16px;font-size:13px;transition:all .15s;cursor:pointer;}
+.btn-redo:hover{border-color:var(--bord2);color:var(--text);}
+
+/* SKELETON */
+.skel{background:linear-gradient(90deg,var(--bg3) 25%,var(--sur2) 50%,var(--bg3) 75%);background-size:200% 100%;animation:sk 1.4s infinite;border-radius:6px;height:13px;margin-bottom:8px;}
+@keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.dots{display:flex;gap:4px;align-items:center;}
+.dots span{width:5px;height:5px;background:var(--green);border-radius:50%;animation:dp 1.2s infinite;}
+.dots span:nth-child(2){animation-delay:.2s;}
+.dots span:nth-child(3){animation-delay:.4s;}
+@keyframes dp{0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1}}
+
+@media(max-width:500px){
+  .res-hero-top{flex-direction:column;}
+  .ars-box{width:100%;min-width:0;}
+  .action-strip{flex-direction:column;}
+}
+
+/* ═══════════════════════════════
+   PRINT / PDF STYLES
+═══════════════════════════════ */
+@media print {
+  /* Sembunyikan yang tidak perlu */
+  .nav, .pg-form, #pg-form, .form-footer,
+  .action-strip, .btn-redo, .btn-next,
+  button, .dots { display: none !important; }
+
+  /* Tampilkan header & footer print */
+  #printHeader, #printFooter { display: block !important; }
+
+  /* Paksa hasil keliatan */
+  #pg-result { display: block !important; }
+  .pg { display: block !important; }
+
+  body { background: white; font-size: 12px; }
+  .res-wrap { padding: 0; max-width: 100%; }
+
+  /* Print header */
+  #pg-result::before {
+    content: '';
+    display: block;
+  }
+
+  .res-hero, .dim-card, .rmap-wrap, .diag-wrap,
+  .ai-panel, .road-wrap { break-inside: avoid; }
+
+  /* Sembunyikan tombol WA di print */
+  a[href*="wa.me"] { display: none !important; }
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-logo" href="#">
+    <div class="nav-icon">🗺️</div>
+    <div>
+      <span class="nav-wordmark">PeluangMap</span>
+      <span class="nav-sub">Panoramic Business Park · Riset Disertasi Unpas 2026</span>
+    </div>
+  </a>
+  <span class="step-pill" id="navPill">Diagnostic Assessment</span>
+</nav>
+
+<!-- ══════════════════ FORM PAGE ══════════════════ -->
+<div class="pg on" id="pg-form">
+<div class="form-wrap">
+
+  <!-- INFORMED CONSENT BANNER -->
+  <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:14px;padding:18px 20px;margin-bottom:16px;">
+    <div style="font-size:18px;text-align:center;margin-bottom:8px;letter-spacing:2px;">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيم</div>
+    <div style="font-size:13px;font-weight:700;color:#166534;text-align:center;margin-bottom:10px;">🌿 Sampurasun! Selamat datang di PeluangMap!</div>
+    <div style="font-size:12px;color:#15803D;line-height:1.9;text-align:center;">
+      Rampes — hatur nuhun sampun kersa sumping. 🙏<br>
+      Riset disertasi <strong>A. Mulyana</strong> · Doktor Ilmu Manajemen · Unpas 2026<br>
+      Dikembangkan di <strong>Panoramic Business Park</strong>, Bandung Barat 🏡<br><br>
+      Framework ini sedang terus dikembangkan — Alhamdulillah UMKM binaan kami<br>
+      <strong>Fatahati Manajemen</strong> tampil nasional di <strong>Metro TV Juragan Jaman Now Season 5</strong> 🏆<br><br>
+      <em>Silih asah, silih asih, silih asuh</em> 🤝<br>
+      Partisipasi <strong>gratis & sukarela</strong> · Hadiahnya: <strong>ARS Score + roadmap personal</strong> dari AI 🎁<br><br>
+      Hatur nuhun — kontribusimu berarti banget untuk UMKM Indonesia! 🙏
+    </div>
+  </div>
+
+  <div class="hero-form">
+    <div class="hero-eyebrow">🔍 Langkah 1 dari 3 — Diagnostic Assessment</div>
+    <h1 class="hero-h1">Bisnis kamu udah siap<br><em>naik level pakai AI?</em></h1>
+    <p class="hero-sub">Jawab 20 pertanyaan santai tentang bisnismu. AI akan hitung AI Readiness Score (ARS) dan kasih roadmap personal dalam hitungan detik.</p>
+    <div class="theory-tags">
+      <span class="ttag" style="color:#67B8FA;border-color:#BFDBFE;background:#EFF6FF">Resource-Based View</span>
+      <span class="ttag" style="color:#16a34a;border-color:#BBF7D0;background:#F0FDF4">Dynamic Capabilities</span>
+      <span class="ttag" style="color:#7C3AED;border-color:#DDD6FE;background:#F5F3FF">Digital Readiness</span>
+      <span class="ttag" style="color:#D97706;border-color:#FDE68A;background:#FFFBEB">Stage-Based Adoption</span>
+    </div>
+  </div>
+
+  <!-- PROFIL BISNIS -->
+  <div class="profil-card">
+    <div class="profil-head">
+      <div class="profil-icon">🏢</div>
+      <div>
+        <div class="profil-title">Cerita Dikit Tentang Bisnismu</div>
+        <div class="profil-desc">Biar AI-nya bisa kasih saran yang pas dan personal buat bisnis kamu</div>
+      </div>
+    </div>
+    <div class="profil-body">
+      <div class="profil-grid">
+        <div class="profil-grid-full">
+          <label class="field-label">Nama bisnis / usaha kamu <span class="field-req">*</span></label>
+          <input class="field-input" id="f-name" type="text" placeholder="contoh: Warung Makan Bu Sri, Toko Kue Rasa Rumah...">
+        </div>
+        <div>
+          <label class="field-label">Sektor usaha <span class="field-req">*</span></label>
+          <select class="field-input" id="f-sektor">
+            <option value="">— Pilih sektor —</option>
+            <option>Kuliner & F&B</option>
+            <option>Fashion & Tekstil</option>
+            <option>Kerajinan & Kreatif</option>
+            <option>Jasa & Konsultasi</option>
+            <option>Perdagangan Umum</option>
+            <option>Pertanian & Agribisnis</option>
+            <option>Kesehatan & Kecantikan</option>
+            <option>Pendidikan & Pelatihan</option>
+            <option>Teknologi & Digital</option>
+            <option>Lainnya</option>
+          </select>
+        </div>
+        <div>
+          <label class="field-label">Kota / Kabupaten <span class="field-req">*</span></label>
+          <input class="field-input" id="f-kota" type="text" placeholder="contoh: Bandung, Bekasi, Surabaya...">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- D1: PROFIL BISNIS & ASET -->
+  <div class="fsec">
+    <div class="fsec-head">
+      <div class="fsec-icon" style="background:#E6F1FB;border-color:#BFDBFE;">📦</div>
+      <div class="fsec-meta">
+        <div class="fsec-title">D1 · Profil Bisnis & Aset Operasional</div>
+        <div class="fsec-desc">Resource-Based View · Fondasi scaling</div>
+      </div>
+      <span class="fsec-score" id="pill1" style="background:#EFF6FF;color:#2563EB;border-color:#BFDBFE;">0–25</span>
+    </div>
+    <div class="fsec-body">
+
+      <div class="qblock">
+        <span class="qnum">D1 · 1/5</span>
+        <span class="qlabel">"Usaha Bapak/Ibu sudah jalan berapa lama, dan sekarang omzetnya kira-kira berapa per bulan?"</span>
+        <span class="qtype">Numerik terbuka · Usia usaha + omzet bulanan</span>
+        <textarea class="qtextarea" id="d1q1" placeholder="Contoh: Sudah 3 tahun, omzet sekitar 8–10 juta per bulan..."></textarea>
+        <div class="char-count" id="cc-d1q1">0 karakter</div>
+        <div class="char-warn" id="warn-d1q1">✍️ Jawab minimal 20 karakter ya — semakin detail, skor makin akurat!</div>
+      </div>
+      <div class="q-divider"></div>
+
+      <div class="qblock">
+        <span class="qnum">D1 · 2/5</span>
+        <span class="qlabel">"Kalau ada orang asing datang, Bapak/Ibu bisa jelaskan usaha ini dalam 1–2 kalimat nggak — apa yang dijual dan siapa yang biasanya beli?"</span>
+        <span class="qtype">Terbuka singkat · Value proposition + segmen pelanggan</span>
+        <span class="qnote">Mengukur kejelasan proposisi nilai — kalau sulit menjelaskan, ini sinyal penting</span>
+        <textarea class="qtextarea" id="d1q2" placeholder="Contoh: Kami jual katering sehat untuk karyawan kantoran, pelanggan utamanya perusahaan dan startup..."></textarea>
+        <div class="char-count" id="cc-d1q2">0 karakter</div>
+        <div class="char-warn" id="warn-d1q2">✍️ Jawab minimal 20 karakter ya — semakin detail, skor makin akurat!</div>
+      </div>
+      <div class="q-divider"></div>
+
+      <div class="qblock">
+        <span class="qnum">D1 · 3/5</span>
+        <span class="qlabel">"Selain produk/jasa utama, aset apa yang Bapak/Ibu punya sekarang? Misalnya: tempat usaha, kendaraan, mesin, stok barang, atau pelanggan tetap yang sudah ada?"</span>
+        <span class="qtype">Checklist + isian · Inventarisasi aset fisik & relasional</span>
+        <textarea class="qtextarea" id="d1q3" placeholder="Contoh: Punya dapur sendiri, 1 motor untuk antar, 30 pelanggan tetap, stok bahan baku 2 minggu..."></textarea>
+        <div class="char-count" id="cc-d1q3">0 karakter</div>
+        <div class="char-warn" id="warn-d1q3">✍️ Jawab minimal 20 karakter ya — semakin detail, skor makin akurat!</div>
+      </div>
+      <div class="q-divider"></div>
+
+      <div class="qblock">
+        <span class="qnum">D1 · 4/5</span>
+        <span class="qlabel">"Kalau Bapak/Ibu libur seminggu, usaha ini bisa jalan sendiri nggak? Kenapa?"</span>
+        <span class="qtype">Skala + alasan · Ketergantungan operasional pada owner (SOP readiness)</span>
+        <span class="qnote">Pertanyaan ini terasa santai tapi mengukur kematangan SOP secara tidak langsung</span>
+        <textarea class="qtextarea" id="d1q4" placeholder="Contoh: Belum bisa, karena semua keputusan masih harus lewat saya. Karyawan belum punya SOP yang jelas..."></textarea>
+        <div class="char-count" id="cc-d1q4">0 karakter</div>
+        <div class="char-warn" id="warn-d1q4">✍️ Jawab minimal 20 karakter ya — semakin detail, skor makin akurat!</div>
+      </div>
+      <div class="q-divider"></div>
+
+      <div class="qblock">
+        <span class="qnum">D1 · 5/5</span>
+        <span class="qlabel">"Dibanding pesaing terdekat di sekitar sini, apa satu hal yang bikin orang lebih pilih usaha Bapak/Ibu?"</span>
+        <span class="qtype">Terbuka · Competitive advantage yang dirasakan</span>
+        <textarea class="qtextarea" id="d1q5" placeholder="Contoh: Harga lebih terjangkau dengan porsi lebih besar, pelayanan lebih ramah dan cepat..."></textarea>
+        <div class="char-count" id="cc-d1q5">0 karakter</div>
+        <div class="char-warn" id="warn-d1q5">✍️ Jawab minimal 20 karakter ya — semakin detail, skor makin akurat!</div>
+      </div>
+
+      <div class="scoring-note">💡 Skor D1: 0–25 · Tiap jawaban dinilai AI (0–5) berdasarkan kejelasan, kedalaman, dan relevansi scaling</div>
+    </div>
+  </div>
+
+  <!-- D2: KAPABILITAS & MINDSET -->
+  <div class="fsec">
+    <div class="fsec-head">
+      <div class="fsec-icon" style="background:#EAF3DE;border-color:#BBF7D0;">🧠</div>
+      <div class="fsec-meta">
+        <div class="fsec-title">D2 · Kapabilitas & Mindset Owner</div>
+        <div class="fsec-desc">Dynamic Capabilities · Owner sebagai bottleneck scaling</div>
+      </div>
+      <span class="fsec-score" id="pill2" style="background:#F0FDF4;color:#16A34A;border-color:#BBF7D0;">0–25</span>
+    </div>
+    <div class="fsec-body">
+
+      <div class="qblock">
+        <span class="qnum">D2 · 1/5</span>
+        <span class="qlabel">"Sebelum usaha ini, Bapak/Ibu pernah kerja di bidang apa, atau pernah punya usaha lain sebelumnya?"</span>
+        <span class="qtype">Terbuka · Rekam jejak & transfer keahlian</span>
+        <textarea class="qtextarea" id="d2q1" placeholder="Contoh: Dulu kerja 5 tahun di perusahaan marketing, pernah punya usaha laundry tapi tutup..."></textarea>
+        <div class="char-count" id="cc-d2q1">0 karakter</div>
+        <div class="char-warn" id="warn-d2q1">✍️ Jawab minimal 20 karakter ya — semakin detail, skor makin akurat!</div>
+      </div>
+      <div class="q-divider"></div>
+
+      <div class="qblock">
+        <span class="qnum">D2 · 2/5</span>
+        <span class="qlabel">"Dalam 2 tahun terakhir, pernah nggak usaha ini menghadapi situasi yang hampir bikin nyerah? Gimana akhirnya bisa dilalui?"</span>
+        <span class="qtype">Naratif · Resiliensi & adaptive capacity</span>
+        <span class="qnote">Pertanyaan krusial — cara merespons krisis adalah prediktor terkuat kemampuan scaling</span>
+        <textarea class="qtextarea" id="d2q2" placeholder="Contoh: Pernah hampir tutup waktu pandemi, tapi akhirnya beralih ke delivery online dan selamat..."></textarea>
+        <div class="char-count" id="cc-d2q2">0 karakter</div>
+        <div class="char-warn" id="warn-d2q2">✍️ Jawab minimal 20 karakter ya — semakin detail, skor makin akurat!</div>
+      </div>
+      <div class="q-divider"></div>
+
+      <div class="qblock">
+        <span class="qnum">D2 · 3/5</span>
+        <span class="qlabel">"Kalau ada karyawan atau mitra yang minta negosiasi gaji atau kerja sama, Bapak/Ibu biasanya gimana menghadapinya?"</span>
+        <span class="qtype">Skenario · Leadership & negotiation capability</span>
+        <textarea class="qtextarea" id="d2q3" placeholder="Contoh: Biasanya saya dengerin dulu keluhannya, terus cari titik tengah yang adil..."></textarea>
+        <div class="char-count" id="cc-d2q3">0 karakter</div>
+        <div class="char-warn" id="warn-d2q3">✍️ Jawab minimal 20 karakter ya — semakin detail, skor makin akurat!</div>
+      </div>
+      <div class="q-divider"></div>
+
+      <div class="qblock">
+        <span class="qnum">D2 · 4/5</span>
+        <span class="qlabel">"Menurut Bapak/Ibu sendiri, apa yang paling jago dan paling lemah dari diri sendiri sebagai pemilik usaha?"</span>
+        <span class="qtype">Self-assessment · Kesadaran diri (self-awareness) sebagai kapabilitas strategis</span>
+        <textarea class="qtextarea" id="d2q4" placeholder="Contoh: Jago di produk dan relasi pelanggan, tapi lemah di keuangan dan pemasaran digital..."></textarea>
+        <div class="char-count" id="cc-d2q4">0 karakter</div>
+        <div class="char-warn" id="warn-d2q4">✍️ Jawab minimal 20 karakter ya — semakin detail, skor makin akurat!</div>
+      </div>
+      <div class="q-divider"></div>
+
+      <div class="qblock">
+        <span class="qnum">D2 · 5/5</span>
+        <span class="qlabel">"Dalam sebulan terakhir, Bapak/Ibu belajar hal baru apa saja yang berhubungan dengan usaha ini — dari mana sumbernya?"</span>
+        <span class="qtype">Faktual terbaru · Learning agility & akses pengetahuan</span>
+        <textarea class="qtextarea" id="d2q5" placeholder="Contoh: Belajar cara buat Reels dari YouTube, ikut webinar UMKM online gratis kemarin..."></textarea>
+        <div class="char-count" id="cc-d2q5">0 karakter</div>
+        <div class="char-warn" id="warn-d2q5">✍️ Jawab minimal 20 karakter ya — semakin detail, skor makin akurat!</div>
+      </div>
+
+      <div class="scoring-note">💡 Skor D2: 0–25 · Fokus pada pola berpikir, bukan jawaban benar/salah</div>
+    </div>
+  </div>
+
+  <!-- D3: KESIAPAN DIGITAL & AI -->
+  <div class="fsec">
+    <div class="fsec-head">
+      <div class="fsec-icon" style="background:#FAEEDA;border-color:#FDE68A;">⚡</div>
+      <div class="fsec-meta">
+        <div class="fsec-title">D3 · Kesiapan Digital & AI</div>
+        <div class="fsec-desc">Digital Readiness · Inti AI-Driven Framework</div>
+      </div>
+      <span class="fsec-score" id="pill3" style="background:#FFFBEB;color:#D97706;border-color:#FDE68A;">0–25</span>
+    </div>
+    <div class="fsec-body">
+
+      <div class="qblock">
+        <span class="qnum">D3 · 1/5</span>
+        <span class="qlabel">"Sekarang, untuk urusan usaha, Bapak/Ibu pakai aplikasi atau platform digital apa saja? (misalnya: WhatsApp, Instagram, Tokopedia, Google Spreadsheet, dll.)"</span>
+        <span class="qtype">Checklist + isian · Digital tools inventory</span>
+        <textarea class="qtextarea" id="d3q1" placeholder="Contoh: WhatsApp untuk order, Instagram untuk promosi, Tokopedia untuk jualan online, Excel untuk stok..."></textarea>
+        <div class="char-count" id="cc-d3q1">0 karakter</div>
+        <div class="char-warn" id="warn-d3q1">✍️ Jawab minimal 20 karakter ya — semakin detail, skor makin akurat!</div>
+      </div>
+      <div class="q-divider"></div>
+
+      <div class="qblock">
+        <span class="qnum">D3 · 2/5</span>
+        <span class="qlabel">"Pernah nggak coba pakai AI seperti ChatGPT, Google Gemini, atau sejenisnya — untuk urusan usaha? Kalau pernah, buat apa?"</span>
+        <span class="qtype">Faktual + eksplorasi · AI adoption & use case awareness</span>
+        <span class="qnote">"Pernah nggak" lebih ramah daripada "sudah menggunakan?" — tidak menghakimi</span>
+        <textarea class="qtextarea" id="d3q2" placeholder="Contoh: Pernah pakai ChatGPT buat nulis caption Instagram, hasilnya lumayan tapi masih harus diedit..."></textarea>
+        <div class="char-count" id="cc-d3q2">0 karakter</div>
+        <div class="char-warn" id="warn-d3q2">✍️ Jawab minimal 20 karakter ya — semakin detail, skor makin akurat!</div>
+      </div>
+      <div class="q-divider"></div>
+
+      <div class="qblock">
+        <span class="qnum">D3 · 3/5</span>
+        <span class="qlabel">"Kalau ada tools gratis yang bisa bantu usaha Bapak/Ibu — misalnya bikin konten, catat keuangan, atau balas chat pelanggan otomatis — kira-kira mau dicoba nggak? Ada kekhawatiran apa?"</span>
+        <span class="qtype">Skenario · Adoption intention + perceived barrier</span>
+        <textarea class="qtextarea" id="d3q3" placeholder="Contoh: Mau banget! Tapi khawatir ribet belajarnya dan takut data pelanggan bocor..."></textarea>
+        <div class="char-count" id="cc-d3q3">0 karakter</div>
+        <div class="char-warn" id="warn-d3q3">✍️ Jawab minimal 20 karakter ya — semakin detail, skor makin akurat!</div>
+      </div>
+      <div class="q-divider"></div>
+
+      <div class="qblock">
+        <span class="qnum">D3 · 4/5</span>
+        <span class="qlabel">"Untuk koneksi internet dan perangkat (HP/laptop), Bapak/Ibu rasa sudah cukup mendukung kalau mau pakai lebih banyak tools digital?"</span>
+        <span class="qtype">Faktual · Infrastruktur & digital access readiness</span>
+        <textarea class="qtextarea" id="d3q4" placeholder="Contoh: HP sudah bagus, internet lancar pakai WiFi. Tapi belum punya laptop sendiri..."></textarea>
+        <div class="char-count" id="cc-d3q4">0 karakter</div>
+        <div class="char-warn" id="warn-d3q4">✍️ Jawab minimal 20 karakter ya — semakin detail, skor makin akurat!</div>
+      </div>
+      <div class="q-divider"></div>
+
+      <div class="qblock">
+        <span class="qnum">D3 · 5/5</span>
+        <span class="qlabel">"Sekarang, ada nggak orang di tim atau keluarga yang lebih paham soal digital/teknologi dan bisa bantu kalau ada kesulitan?"</span>
+        <span class="qtype">Faktual · Digital support network (tech champion availability)</span>
+        <textarea class="qtextarea" id="d3q5" placeholder="Contoh: Ada anak saya yang masih kuliah IT, biasanya dia yang bantu kalau ada masalah teknis..."></textarea>
+        <div class="char-count" id="cc-d3q5">0 karakter</div>
+        <div class="char-warn" id="warn-d3q5">✍️ Jawab minimal 20 karakter ya — semakin detail, skor makin akurat!</div>
+      </div>
+
+      <div class="scoring-note">💡 Skor D3: 0–25 · Dimensi ini paling langsung memengaruhi AI Readiness Score (ARS) keseluruhan</div>
+    </div>
+  </div>
+
+  <!-- D4: AMBISI SCALING -->
+  <div class="fsec">
+    <div class="fsec-head">
+      <div class="fsec-icon" style="background:#EEEDFE;border-color:#DDD6FE;">🚀</div>
+      <div class="fsec-meta">
+        <div class="fsec-title">D4 · Ambisi Scaling & Dukungan Ekosistem</div>
+        <div class="fsec-desc">Stage-Based Adoption · Niat kuat + dukungan nyata</div>
+      </div>
+      <span class="fsec-score" id="pill4" style="background:#F5F3FF;color:#7C3AED;border-color:#DDD6FE;">0–25</span>
+    </div>
+    <div class="fsec-body">
+
+      <div class="qblock">
+        <span class="qnum">D4 · 1/5</span>
+        <span class="qlabel">"Kalau boleh jujur, 12–24 bulan ke depan Bapak/Ibu mau usaha ini ada di titik mana? Omzetnya, jumlah karyawan, atau jangkauan pasarnya?"</span>
+        <span class="qtype">Terbuka spesifik · Visi scaling yang terukur</span>
+        <span class="qnote">"Kalau boleh jujur" membuka ruang untuk target ambisius tanpa rasa malu</span>
+        <textarea class="qtextarea" id="d4q1" placeholder="Contoh: Mau omzet 50 juta per bulan, tambah 3 karyawan, bisa jual ke seluruh Jawa Barat..."></textarea>
+        <div class="char-count" id="cc-d4q1">0 karakter</div>
+        <div class="char-warn" id="warn-d4q1">✍️ Jawab minimal 20 karakter ya — semakin detail, skor makin akurat!</div>
+      </div>
+      <div class="q-divider"></div>
+
+      <div class="qblock">
+        <span class="qnum">D4 · 2/5</span>
+        <span class="qlabel">"Untuk mencapai target tadi, kira-kira butuh apa dulu yang belum ada sekarang? Uang, orang, ilmu, atau yang lain?"</span>
+        <span class="qtype">Gap analysis · Resource gap untuk scaling</span>
+        <textarea class="qtextarea" id="d4q2" placeholder="Contoh: Butuh modal tambahan untuk beli mesin, butuh tim marketing yang lebih kuat..."></textarea>
+        <div class="char-count" id="cc-d4q2">0 karakter</div>
+        <div class="char-warn" id="warn-d4q2">✍️ Jawab minimal 20 karakter ya — semakin detail, skor makin akurat!</div>
+      </div>
+      <div class="q-divider"></div>
+
+      <div class="qblock">
+        <span class="qnum">D4 · 3/5</span>
+        <span class="qlabel">"Keluarga atau orang-orang terdekat Bapak/Ibu mendukung nggak kalau usaha ini mau diperbesar? Ada yang khawatir atau ragu-ragu?"</span>
+        <span class="qtype">Relasional · Family/social support sebagai faktor ekosistem</span>
+        <textarea class="qtextarea" id="d4q3" placeholder="Contoh: Istri sangat mendukung, tapi orang tua masih ragu karena khawatir risikonya besar..."></textarea>
+        <div class="char-count" id="cc-d4q3">0 karakter</div>
+        <div class="char-warn" id="warn-d4q3">✍️ Jawab minimal 20 karakter ya — semakin detail, skor makin akurat!</div>
+      </div>
+      <div class="q-divider"></div>
+
+      <div class="qblock">
+        <span class="qnum">D4 · 4/5</span>
+        <span class="qlabel">"Ada nggak sekarang mentor, komunitas usaha, atau teman sesama pengusaha yang bisa diajak diskusi kalau ada masalah atau mau ambil keputusan besar?"</span>
+        <span class="qtype">Jaringan · Mentor/peer network sebagai accelerator scaling</span>
+        <textarea class="qtextarea" id="d4q4" placeholder="Contoh: Ikut komunitas UMKM kecamatan, ada 2 teman pengusaha yang sering diskusi, tapi belum punya mentor formal..."></textarea>
+        <div class="char-count" id="cc-d4q4">0 karakter</div>
+        <div class="char-warn" id="warn-d4q4">✍️ Jawab minimal 20 karakter ya — semakin detail, skor makin akurat!</div>
+      </div>
+      <div class="q-divider"></div>
+
+      <div class="qblock">
+        <span class="qnum">D4 · 5/5</span>
+        <span class="qlabel">"Kalau besok ada peluang bagus — misalnya order besar, tawaran kerja sama, atau bisa masuk pasar baru — Bapak/Ibu siap nggak, atau masih ada yang bikin ragu?"</span>
+        <span class="qtype">Skenario · Opportunity readiness + psychological capital</span>
+        <span class="qnote">Pertanyaan penutup yang sekaligus memancing refleksi mendalam</span>
+        <textarea class="qtextarea" id="d4q5" placeholder="Contoh: Secara mental siap! Tapi masih ragu di kapasitas produksi yang belum cukup..."></textarea>
+        <div class="char-count" id="cc-d4q5">0 karakter</div>
+        <div class="char-warn" id="warn-d4q5">✍️ Jawab minimal 20 karakter ya — semakin detail, skor makin akurat!</div>
+      </div>
+
+      <div class="scoring-note">💡 Skor D4: 0–25 · Dimensi ini paling prediktif untuk scaling — tapi sering diabaikan diagnostic tools biasa</div>
+    </div>
+  </div>
+
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;font-size:12px;color:var(--muted);">
+    <strong style="color:var(--text);">Total: 20 pertanyaan · 4 dimensi · Skor maks 100</strong><br>
+    Setiap jawaban dinilai AI (0–5) → skor per dimensi (0–25) → ARS total (0–100) → diagnosa + roadmap otomatis
+  </div>
+
+  <div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:var(--r);padding:14px 18px;margin-top:10px;font-size:12px;color:#92400E;display:flex;gap:10px;align-items:flex-start;">
+    <span style="font-size:16px;flex-shrink:0;">💡</span>
+    <div>
+      <strong>Tips jawaban yang bagus:</strong> Minimal 20 karakter per jawaban ya!
+      Semakin detail dan jujur jawabanmu, semakin akurat skor AI-nya dan semakin personal roadmap yang kamu dapat.
+      Tidak ada jawaban benar atau salah — yang penting jujur! 😊
+    </div>
+  </div>
+
+</div><!-- /form-wrap -->
+
+<div class="form-footer">
+  <div class="prog-mini">
+    <div class="prog-mini-track"><div class="prog-mini-fill" id="progFill" style="width:0%"></div></div>
+    <div class="prog-mini-lbl" id="progLbl">0/20 terjawab · Tiap jawaban min. 20 karakter</div>
+  </div>
+  <button class="btn-scan" id="btnRun" disabled onclick="runDiagnostic()">
+    🤖 Analisis Sekarang
+  </button>
+</div>
+</div><!-- /pg-form -->
+
+<!-- ══════════════════ RESULT PAGE ══════════════════ -->
+<div class="pg" id="pg-result">
+<div class="res-wrap">
+
+  <!-- PRINT HEADER — hanya muncul saat print -->
+  <div style="display:none;" class="print-header" id="printHeader">
+    <div style="text-align:center;padding:16px 0 12px;border-bottom:2px solid #16A34A;margin-bottom:16px;">
+      <div style="font-size:16px;letter-spacing:2px;margin-bottom:6px;">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيم</div>
+      <div style="font-size:20px;font-weight:700;color:#16A34A;">🗺️ PeluangMap</div>
+      <div style="font-size:11px;color:#4A7A5A;margin-top:2px;">AI-Driven UMKM Empowerment Framework · Versi Revisi 2026</div>
+      <div style="font-size:11px;color:#4A7A5A;">A. Mulyana · Doktor Ilmu Manajemen · Universitas Pasundan (Unpas) 2026</div>
+    </div>
+  </div>
+
+  <!-- HERO ARS -->
+  <div class="res-hero">
+    <div class="res-hero-top">
+      <div style="flex:1;">
+        <div id="r_biz" class="res-biz">—</div>
+        <div id="r_type" class="res-type">—</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span id="r_level_badge" class="ars-level">—</span>
+          <span id="r_stage" style="font-size:12px;color:var(--muted);padding:4px 0;"></span>
+        </div>
+      </div>
+      <div class="ars-box">
+        <div class="ars-label">AI Readiness Score</div>
+        <div class="ars-score" id="r_score">—</div>
+        <div class="ars-max">dari 100</div>
+        <div class="ars-level" id="r_level" style="background:var(--gdim);color:var(--green);">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIM SCORES -->
+  <div class="dim-grid">
+    <div class="dim-card">
+      <div class="dim-card-top">
+        <span class="dim-card-label" style="color:#2563EB;">📦 D1 · Profil Bisnis</span>
+        <span class="dim-card-score" id="ds1" style="color:#2563EB;">—</span>
+      </div>
+      <div class="dim-bar-track"><div class="dim-bar-fill" id="db1" style="width:0%;background:#2563EB;"></div></div>
+      <div class="dim-card-items" id="di1"></div>
+    </div>
+    <div class="dim-card">
+      <div class="dim-card-top">
+        <span class="dim-card-label" style="color:#16A34A;">🧠 D2 · Kapabilitas</span>
+        <span class="dim-card-score" id="ds2" style="color:#16A34A;">—</span>
+      </div>
+      <div class="dim-bar-track"><div class="dim-bar-fill" id="db2" style="width:0%;background:#16A34A;"></div></div>
+      <div class="dim-card-items" id="di2"></div>
+    </div>
+    <div class="dim-card">
+      <div class="dim-card-top">
+        <span class="dim-card-label" style="color:#D97706;">⚡ D3 · Digital & AI</span>
+        <span class="dim-card-score" id="ds3" style="color:#D97706;">—</span>
+      </div>
+      <div class="dim-bar-track"><div class="dim-bar-fill" id="db3" style="width:0%;background:#D97706;"></div></div>
+      <div class="dim-card-items" id="di3"></div>
+    </div>
+    <div class="dim-card">
+      <div class="dim-card-top">
+        <span class="dim-card-label" style="color:#7C3AED;">🚀 D4 · Ambisi Scaling</span>
+        <span class="dim-card-score" id="ds4" style="color:#7C3AED;">—</span>
+      </div>
+      <div class="dim-bar-track"><div class="dim-bar-fill" id="db4" style="width:0%;background:#7C3AED;"></div></div>
+      <div class="dim-card-items" id="di4"></div>
+    </div>
+  </div>
+
+  <!-- STAGE MAP -->
+  <div class="rmap-wrap">
+    <div class="rmap-title">🗺️ Stage Kesiapan AI</div>
+    <div class="rmap-stages">
+      <div class="rmap-stage">
+        <div class="rmap-dot" id="st0">🌱</div>
+        <div class="rmap-slabel" id="stl0">Pra-Digital</div>
+      </div>
+      <div class="rmap-stage">
+        <div class="rmap-dot" id="st1">👀</div>
+        <div class="rmap-slabel" id="stl1">Awareness</div>
+      </div>
+      <div class="rmap-stage">
+        <div class="rmap-dot" id="st2">🛠️</div>
+        <div class="rmap-slabel" id="stl2">Low-Cost Tools</div>
+      </div>
+      <div class="rmap-stage">
+        <div class="rmap-dot" id="st3">💪</div>
+        <div class="rmap-slabel" id="stl3">Commitment</div>
+      </div>
+      <div class="rmap-stage">
+        <div class="rmap-dot" id="st4">🤖</div>
+        <div class="rmap-slabel" id="stl4">AI-Native</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIAGNOSA -->
+  <div class="diag-wrap">
+    <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;">🔍 Diagnosa Kekuatan & Area Pengembangan</div>
+    <div class="diag-grid">
+      <div class="diag-box" style="border:1px solid var(--gdim2);">
+        <div class="diag-box-title" style="color:var(--green);">✅ Kekuatan</div>
+        <div id="dg-kekuatan"><div class="skel"></div><div class="skel" style="width:75%"></div></div>
+      </div>
+      <div class="diag-box" style="border:1px solid #FECACA;">
+        <div class="diag-box-title" style="color:#E11D48;">⚠️ Perlu Dikembangkan</div>
+        <div id="dg-kelemahan"><div class="skel"></div><div class="skel" style="width:75%"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI ANALISIS -->
+  <div class="ai-panel">
+    <div class="ai-panel-head">
+      <div class="dots"><span></span><span></span><span></span></div>
+      <span>Analisis AI untuk Bisnismu</span>
+    </div>
+    <div class="ai-text" id="r_analisis">
+      <div class="skel"></div><div class="skel" style="width:90%"></div>
+      <div class="skel" style="width:80%"></div><div class="skel" style="width:95%"></div>
+      <div class="skel" style="width:70%"></div>
+    </div>
+  </div>
+
+  <!-- ROADMAP -->
+  <div class="road-wrap">
+    <div class="road-head">🗺️ Roadmap 30 Hari Pertamamu</div>
+    <div class="road-steps" id="r_roadmap">
+      <div class="skel" style="height:70px;border-radius:10px;"></div>
+      <div class="skel" style="height:70px;border-radius:10px;"></div>
+      <div class="skel" style="height:70px;border-radius:10px;"></div>
+    </div>
+  </div>
+
+  <!-- ACTION -->
+  <div class="action-strip">
+    <div class="action-strip-txt">
+      <div class="action-strip-title">Terima kasih sudah ikut diagnostic! 🎉</div>
+      <div class="action-strip-sub">Simpan hasil ini atau bagikan ke teman sesama pelaku UMKM.</div>
+    </div>
+    <button class="btn-redo" onclick="resetForm()">🔄 Ulangi</button>
+    <button class="btn-next" onclick="window.print()">🖨️ Print / Simpan PDF</button>
+  </div>
+
+  <!-- HADIAH EBOOK -->
+  <div style="background:linear-gradient(135deg,#1E40AF,#2563EB);border-radius:14px;padding:20px;text-align:center;margin-bottom:14px;">
+    <div style="font-size:14px;font-weight:700;color:white;margin-bottom:4px;">🎁 Hadiah Eksklusif Peserta PeluangMap!</div>
+    <div style="font-size:12px;color:rgba(255,255,255,0.85);margin-bottom:16px;">
+      Sebagai apresiasi atas partisipasimu dalam riset ini:<br><br>
+      📘 <strong>Laporan Riset Eksklusif</strong><br>
+      <em>"AI &amp; UMKM Indonesia 2026 —<br>Panduan Praktis Berbasis Studi Doktoral"</em><br><br>
+      Kisah nyata · Berbasis riset · Tools praktis · Dari Surviving → Scaling 🚀
+    </div>
+    <a href="https://drive.google.com/file/d/16cfXUJXShGzTEgD-ozPlNvf9C-rl6vpQ/view?usp=sharing" target="_blank"
+      style="display:inline-flex;align-items:center;gap:8px;background:white;color:#1E40AF;font-weight:700;font-size:14px;padding:12px 28px;border-radius:10px;text-decoration:none;">
+      📥 Download Laporan Riset Eksklusif
+    </a>
+    <div style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:10px;">PDF · Eksklusif untuk peserta PeluangMap · Gratis</div>
+  </div>
+
+  <!-- TOMBOL WA -->
+  <div style="background:linear-gradient(135deg,#166534,#16A34A);border-radius:14px;padding:20px;text-align:center;margin-bottom:14px;">
+    <div style="font-size:14px;font-weight:700;color:white;margin-bottom:4px;">🚀 Mau lanjut ke langkah berikutnya?</div>
+    <div style="font-size:12px;color:rgba(255,255,255,0.85);margin-bottom:16px;">
+      PeluangMap adalah Langkah 1–3 dari 12 langkah framework.<br>
+      Hubungi <strong>Agung Mulyana</strong> untuk pendampingan lanjutan — gratis konsultasi awal!
+    </div>
+    <a href="https://wa.me/6281394618039?text=Halo%20Kang%20Agung%2C%20saya%20baru%20selesai%20diagnostic%20PeluangMap%20dan%20mau%20tanya%20langkah%20selanjutnya%20%F0%9F%99%8F" target="_blank"
+      style="display:inline-flex;align-items:center;gap:8px;background:white;color:#166534;font-weight:700;font-size:14px;padding:12px 28px;border-radius:10px;text-decoration:none;transition:all .2s;">
+      💬 Chat Agung di WhatsApp
+    </a>
+    <div style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:10px;">0813-9461-8039 · Panoramic Business Park, Bandung Barat</div>
+  </div>
+
+  <!-- FOOTER BRANDING -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;margin-top:8px;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border);">
+      <div style="width:36px;height:36px;border-radius:9px;background:var(--gdim2);border:1px solid var(--bord2);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">🗺️</div>
+      <div>
+        <div style="font-size:14px;font-weight:700;color:var(--text);">PeluangMap</div>
+        <div style="font-size:11px;color:var(--muted);">AI-Driven UMKM Empowerment Framework · Versi Revisi 2026</div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);line-height:1.9;">
+      <strong style="color:var(--text);">Peneliti:</strong> Agung Mulyana <br>
+      <strong style="color:var(--text);">Program:</strong> Doktor Ilmu Manajemen · Universitas Pasundan (Unpas), Bandung<br>
+      
+      <strong style="color:var(--text);">Living Lab:</strong> Panoramic Business Park · Ngamprah, Bandung Barat<br>
+      <strong style="color:var(--text);">Lokus UMKM:</strong> Fatahati Manajemen &amp; 6 UMKM mitra lainnya
+    </div>
+    <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);font-size:10px;color:var(--faint);">
+      © 2026 Panoramic Business Park · A. Mulyana · Data riset dilindungi<br>
+      DOI: <a href="https://doi.org/10.5281/zenodo.20250661" target="_blank" style="color:inherit;opacity:.8;">10.5281/zenodo.20250661</a>
+    </div>
+  </div>
+
+  <!-- PRINT FOOTER — hanya muncul saat print -->
+  <div style="display:none;" id="printFooter">
+    <div style="margin-top:24px;padding-top:16px;border-top:2px solid #16A34A;font-size:10px;color:#4A7A5A;line-height:1.9;">
+      <div style="font-weight:700;font-size:12px;color:#166534;margin-bottom:6px;">🏡 Panoramic Business & Retreat Park</div>
+      Ngamprah, Bandung Barat — Hanya 5 menit dari Stasiun Whoosh KCIC Padalarang<br>
+      Ruang bisnis asri di lahan 2.000 m²+ · Pemandangan kota, perbukitan & sawah hijau<br><br>
+      <strong>Fasilitas:</strong> Meeting & Workshop Outdoor/Indoor (10–100 orang) · Glamping & Staycation ·
+      Kolam & Garden Area · Parkir Luas · Private & Exclusive<br>
+      Cocok untuk: Event Korporat · Workshop UMKM · Team Building · Me-time Produktif<br><br>
+      <strong>Kontak & Pendampingan:</strong> WhatsApp 0813-9461-8039 (Agung Mulyana)<br>
+      <div style="margin-top:8px;padding-top:8px;border-top:1px solid #D0E4D6;color:#7AAA88;">
+      © 2026 Panoramic Business Park · A. Mulyana · Data riset dilindungi<br>
+      DOI: 10.5281/zenodo.20250661 · peluangmap.netlify.app
+        Dokumen ini digenerate otomatis oleh PeluangMap · peluangmapv2.netlify.app
+      </div>
+    </div>
+  </div>
+
+</div>
+</div><!-- /pg-result -->
+
+<script>
+/* ═══════════════════════════════
+   CHAR COUNTER & PROGRESS
+═══════════════════════════════ */
+const QUESTIONS = ['d1q1','d1q2','d1q3','d1q4','d1q5','d2q1','d2q2','d2q3','d2q4','d2q5','d3q1','d3q2','d3q3','d3q4','d3q5','d4q1','d4q2','d4q3','d4q4','d4q5'];
+
+QUESTIONS.forEach(id => {
+  const el = document.getElementById(id);
+  const cc = document.getElementById('cc-' + id);
+  const warn = document.getElementById('warn-' + id);
+  el.addEventListener('input', () => {
+    const len = el.value.trim().length;
+    cc.textContent = len + ' karakter';
+    if (len === 0) {
+      el.classList.remove('filled','error'); cc.style.color='var(--faint)';
+      if(warn) warn.classList.remove('show');
+    } else if (len < 20) {
+      el.classList.remove('filled'); el.classList.add('error');
+      cc.style.color='#E11D48';
+      if(warn) warn.classList.add('show');
+    } else {
+      el.classList.add('filled'); el.classList.remove('error');
+      cc.style.color='var(--green)';
+      if(warn) warn.classList.remove('show');
+    }
+    updateProgress();
+  });
+});
+
+['f-name','f-sektor','f-kota'].forEach(id => {
+  document.getElementById(id).addEventListener('input', updateProgress);
+  document.getElementById(id).addEventListener('change', updateProgress);
+});
+
+function getAnswered() {
+  return QUESTIONS.filter(id => document.getElementById(id).value.trim().length >= 20).length;
+}
+
+function updateProgress() {
+  const answered = getAnswered();
+  const pct = Math.round((answered / 20) * 100);
+  document.getElementById('progFill').style.width = pct + '%';
+
+  const profilOk = document.getElementById('f-name').value.trim() &&
+                   document.getElementById('f-sektor').value &&
+                   document.getElementById('f-kota').value.trim();
+  const ready = answered === 20 && profilOk;
+
+  const remaining = 20 - answered;
+  document.getElementById('progLbl').textContent =
+    !profilOk ? `${answered}/20 terjawab · Lengkapi nama bisnis & kota dulu` :
+    ready ? `✅ Semua lengkap! Siap dianalisis! 🎉` :
+    `${answered}/20 terjawab · ${remaining} lagi (min. 20 karakter/jawaban)`;
+  document.getElementById('btnRun').disabled = !ready;
+
+  // Update pills
+  const dims = {1:['d1q1','d1q2','d1q3','d1q4','d1q5'],2:['d2q1','d2q2','d2q3','d2q4','d2q5'],3:['d3q1','d3q2','d3q3','d3q4','d3q5'],4:['d4q1','d4q2','d4q3','d4q4','d4q5']};
+  for (let d = 1; d <= 4; d++) {
+    const filled = dims[d].filter(id => document.getElementById(id).value.trim().length >= 20).length;
+    document.getElementById('pill'+d).textContent = filled + '/5 ✓';
+  }
+}
+
+/* ═══════════════════════════════
+   AI CALL
+═══════════════════════════════ */
+async function callAI(prompt) {
+  const resp = await fetch('/api/ai', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messages: [{ role: 'user', content: prompt }] })
+  });
+  const data = await resp.json();
+  if (data.error) throw new Error(data.error.message);
+  const raw = data.choices?.[0]?.message?.content || '{}';
+  return sanitizeJSON(raw);
+}
+
+function sanitizeJSON(raw) {
+  let s = raw.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
+  const start = s.indexOf('{'), end = s.lastIndexOf('}');
+  if (start !== -1 && end !== -1) s = s.slice(start, end + 1);
+  let result = '', inStr = false, escape = false;
+  for (let i = 0; i < s.length; i++) {
+    const ch = s[i];
+    if (escape) { result += ch; escape = false; continue; }
+    if (ch === '\\') { result += ch; escape = true; continue; }
+    if (ch === '"') { inStr = !inStr; result += ch; continue; }
+    if (inStr) {
+      if (ch === '\n') { result += '\\n'; continue; }
+      if (ch === '\r') { result += '\\r'; continue; }
+      if (ch === '\t') { result += '\\t'; continue; }
+      if (ch.charCodeAt(0) < 0x20) continue;
+    }
+    result += ch;
+  }
+  result = result.replace(/,\s*([}\]])/g, '$1');
+  return result;
+}
+
+/* ═══════════════════════════════
+   LEVEL & STAGE
+═══════════════════════════════ */
+function getLevel(score) {
+  if (score <= 30) return { label:'Pra-Digital', stage:0, color:'#FB7185', desc:'Bisnis belum siap adopsi AI. Fokus dulu pada digitalisasi dasar.' };
+  if (score <= 50) return { label:'Awareness', stage:1, color:'#FCD34D', desc:'Mulai menyadari pentingnya digital. Mulai dengan tools gratis.' };
+  if (score <= 65) return { label:'Low-Cost Tools', stage:2, color:'#2DD4BF', desc:'Aktif pakai tools digital. Saatnya masuk AI tools spesifik.' };
+  if (score <= 80) return { label:'Commitment', stage:3, color:'#4ADE80', desc:'Fondasi kuat. Komitmen tinggi. Siap masuk framework penuh.' };
+  return { label:'AI-Native', stage:4, color:'#67B8FA', desc:'Siap skalabilitas dan otomasi penuh berbasis AI.' };
+}
+
+function renderStageMap(stage) {
+  for (let i = 0; i <= 4; i++) {
+    const dot = document.getElementById('st'+i);
+    const lbl = document.getElementById('stl'+i);
+    dot.classList.remove('active','done');
+    lbl.classList.remove('active');
+    if (i < stage) dot.classList.add('done');
+    if (i === stage) { dot.classList.add('active'); lbl.classList.add('active'); }
+  }
+}
+
+/* ═══════════════════════════════
+   MAIN: RUN DIAGNOSTIC
+═══════════════════════════════ */
+async function runDiagnostic() {
+  const name = document.getElementById('f-name').value.trim();
+  const sektor = document.getElementById('f-sektor').value;
+  const kota = document.getElementById('f-kota').value.trim();
+
+  const answers = {};
+  QUESTIONS.forEach(id => { answers[id] = document.getElementById(id).value.trim(); });
+
+  // Switch ke halaman result
+  document.getElementById('pg-form').classList.remove('on');
+  document.getElementById('pg-result').classList.add('on');
+  document.getElementById('navPill').textContent = 'Menganalisis...';
+  window.scrollTo({top:0, behavior:'smooth'});
+
+  // Isi header sementara
+  document.getElementById('r_biz').textContent = name;
+  document.getElementById('r_type').textContent = `${sektor} · ${kota}`;
+  document.getElementById('r_score').textContent = '...';
+
+  // Build prompt
+  const prompt = `Kamu adalah konsultan UMKM senior ahli AI Readiness Framework, Dynamic Capabilities (Teece 2007), Resource-Based View (Barney 1991), dan Stage-Based AI Adoption untuk UMKM Indonesia.
+
+Lakukan Diagnostic Assessment komprehensif untuk UMKM berikut:
+
+PROFIL:
+- Nama: ${name}
+- Sektor: ${sektor}
+- Kota: ${kota}
+
+JAWABAN 20 PERTANYAAN (D1–D4):
+
+=== D1: Profil Bisnis & Aset Operasional (Resource-Based View) ===
+D1Q1 (Usia & omzet): "${answers.d1q1}"
+D1Q2 (Value proposition): "${answers.d1q2}"
+D1Q3 (Inventarisasi aset): "${answers.d1q3}"
+D1Q4 (SOP readiness): "${answers.d1q4}"
+D1Q5 (Competitive advantage): "${answers.d1q5}"
+
+=== D2: Kapabilitas & Mindset Owner (Dynamic Capabilities) ===
+D2Q1 (Rekam jejak): "${answers.d2q1}"
+D2Q2 (Resiliensi krisis): "${answers.d2q2}"
+D2Q3 (Leadership & negosiasi): "${answers.d2q3}"
+D2Q4 (Self-awareness): "${answers.d2q4}"
+D2Q5 (Learning agility): "${answers.d2q5}"
+
+=== D3: Kesiapan Digital & AI (Digital Readiness) ===
+D3Q1 (Digital tools inventory): "${answers.d3q1}"
+D3Q2 (AI adoption experience): "${answers.d3q2}"
+D3Q3 (Adoption intention & barrier): "${answers.d3q3}"
+D3Q4 (Infrastruktur digital): "${answers.d3q4}"
+D3Q5 (Digital support network): "${answers.d3q5}"
+
+=== D4: Ambisi Scaling & Ekosistem (Stage-Based Adoption) ===
+D4Q1 (Visi scaling terukur): "${answers.d4q1}"
+D4Q2 (Resource gap analysis): "${answers.d4q2}"
+D4Q3 (Family/social support): "${answers.d4q3}"
+D4Q4 (Mentor/peer network): "${answers.d4q4}"
+D4Q5 (Opportunity readiness): "${answers.d4q5}"
+
+TUGAS:
+1. Beri skor 0–5 untuk setiap jawaban (0=tidak menjawab, 5=sangat detail & matang)
+2. Hitung total per dimensi (0–25) dan ARS total (0–100)
+3. Buat analisis strategis 3 paragraf dalam Bahasa Indonesia yang hangat dan personal
+4. Identifikasi 3 kekuatan utama dan 3 area pengembangan
+5. Buat roadmap 5 langkah konkret untuk 30 hari ke depan
+
+Balas HANYA dalam format JSON (tanpa teks lain, tanpa markdown fence):
+{
+  "skor": { "d1q1":0,"d1q2":0,"d1q3":0,"d1q4":0,"d1q5":0,"d2q1":0,"d2q2":0,"d2q3":0,"d2q4":0,"d2q5":0,"d3q1":0,"d3q2":0,"d3q3":0,"d3q4":0,"d3q5":0,"d4q1":0,"d4q2":0,"d4q3":0,"d4q4":0,"d4q5":0 },
+  "total_d1":0,"total_d2":0,"total_d3":0,"total_d4":0,"ars_total":0,
+  "analisis":"<3 paragraf analisis strategis dalam Bahasa Indonesia>",
+  "kekuatan":["<kekuatan 1>","<kekuatan 2>","<kekuatan 3>"],
+  "kelemahan":["<area pengembangan 1>","<area pengembangan 2>","<area pengembangan 3>"],
+  "roadmap":[
+    {"minggu":"Minggu 1","judul":"<judul langkah>","deskripsi":"<aksi konkret spesifik untuk bisnis ini>","tag":"<Quick Win/Fondasi/Skill>"},
+    {"minggu":"Minggu 1–2","judul":"<judul>","deskripsi":"<deskripsi>","tag":"<tag>"},
+    {"minggu":"Minggu 2","judul":"<judul>","deskripsi":"<deskripsi>","tag":"<tag>"},
+    {"minggu":"Minggu 3","judul":"<judul>","deskripsi":"<deskripsi>","tag":"<tag>"},
+    {"minggu":"Minggu 4","judul":"<judul>","deskripsi":"<deskripsi>","tag":"<tag>"}
+  ]
+}`;
+
+  try {
+    const jsonStr = await callAI(prompt);
+    const result = JSON.parse(jsonStr);
+
+    const s1 = result.total_d1 || 0;
+    const s2 = result.total_d2 || 0;
+    const s3 = result.total_d3 || 0;
+    const s4 = result.total_d4 || 0;
+    const total = result.ars_total || (s1+s2+s3+s4);
+    const level = getLevel(total);
+
+    // ARS Score
+    document.getElementById('r_score').textContent = total;
+    document.getElementById('r_score').style.color = level.color;
+    document.getElementById('r_level').textContent = `ARS ${total}/100`;
+    document.getElementById('r_level_badge').textContent = level.label;
+    document.getElementById('r_level_badge').style.cssText = `background:var(--gdim);color:${level.color};`;
+    document.getElementById('r_stage').textContent = level.desc;
+    document.getElementById('navPill').textContent = `ARS ${total}/100 · ${level.label}`;
+
+    // Dim scores + bars
+    setTimeout(() => {
+      [[s1,'#2563EB'],[s2,'#16A34A'],[s3,'#D97706'],[s4,'#7C3AED']].forEach(([s,c],i) => {
+        const d = i+1;
+        document.getElementById('ds'+d).textContent = s+'/25';
+        document.getElementById('db'+d).style.width = (s/25*100)+'%';
+      });
+      renderStageMap(level.stage);
+    }, 100);
+
+    // Diagnosa
+    const renderDiagItems = (elId, items, isGood) => {
+      document.getElementById(elId).innerHTML = (items||[]).map(item => `
+        <div class="diag-item">
+          <span class="${isGood ? 'diag-bullet-ok' : 'diag-bullet-pr'}">${isGood ? '✓' : '!'}</span>
+          <span>${item}</span>
+        </div>`).join('');
+    };
+    renderDiagItems('dg-kekuatan', result.kekuatan, true);
+    renderDiagItems('dg-kelemahan', result.kelemahan, false);
+
+    // Analisis
+    document.getElementById('r_analisis').textContent = result.analisis || 'Analisis tidak tersedia.';
+
+    // Roadmap
+    document.getElementById('r_roadmap').innerHTML = (result.roadmap||[]).map((r,i) => `
+      <div class="road-step">
+        <div class="road-num">${i+1}</div>
+        <div class="road-body">
+          <div class="road-week">${r.minggu||''}</div>
+          <div class="road-title">${r.judul||''}</div>
+          <div class="road-desc">${r.deskripsi||''}</div>
+          ${r.tag ? `<span class="road-tag">${r.tag}</span>` : ''}
+        </div>
+      </div>`).join('');
+
+  } catch(e) {
+    document.getElementById('r_analisis').textContent = '⚠️ Gagal memuat analisis AI: ' + e.message + '\n\nPastikan GROQ_KEY sudah diset di Netlify Environment Variables.';
+    document.getElementById('r_score').textContent = '—';
+  }
+}
+
+function resetForm() {
+  document.getElementById('pg-result').classList.remove('on');
+  document.getElementById('pg-form').classList.add('on');
+  document.getElementById('navPill').textContent = 'Diagnostic Assessment';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+</script>
+</body>
+</html>
